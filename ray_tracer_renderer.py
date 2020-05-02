@@ -4,7 +4,7 @@ import threading
 import queue
 import logging
 
-from math_extentions import Vec4, matrix
+from math_extentions import Vec3, Vec4, matrix, random01
 from frame import Frame
 import shaders
 
@@ -20,47 +20,81 @@ class RenderJob:
     def Render(self):
         width = self.frame.width
         height = self.frame.height
-        debug_frame_orientation = False
-        debug_uv_coordinates = False
 
-        # TODO: check if I need to pass view matrix(classic 3D library style) or I can pass only the view matrix
-        perspective_view_matrix = self.scene.camera.perspective_view_matrix
+        render_func = self.FastRender
+        # render_func = self.AntiAliasedRender
+        # render_func = self.DebugRender
 
-        # for y in range(0, height):
         for y in range(self.fromY, self.toY):
             for x in range(self.fromX, self.toX):
-                color = Vec4(0, 0, 0, 255)
-
-                u = (4 * x / width) - 2
-                v = (2 * y / height) - 1
-
-                if debug_frame_orientation:
-                    color.x = x / width
-                    color.y = y / height
-                    color.z = 0.2
-                    self.frame.SetFloatingColorAt(x, y, color)
-                    continue
-                elif debug_uv_coordinates:
-                    color = shaders.DebugUVCoordinates(u, v)
-                    self.frame.SetFloatingColorAt(x, y, color)
-                    continue
-
-                # flip by X axis because the top-left corner is with pixel coordinates 0, height
-                ray = self.scene.camera.MakeRay(u, v)
-                best_intersection = self.scene.CastRay(ray)
-
-                if best_intersection:
-                    closest_light = self.scene.GetClosestLight(best_intersection.world_position)
-                    light_position = (perspective_view_matrix * closest_light.position).xyz()
-
-                    # color = shaders.DebugNormals(u, v, best_intersection.obj, best_intersection)
-                    # color = shaders.DebugDepth(best_intersection)
-                    color = shaders.ComputeColor(best_intersection.obj, best_intersection, light_position)
-                    # color = shaders.ComputeFlatColor(best_intersection.obj, best_intersection, light_position)
-                else:
-                    color = shaders.DebugUVCoordinates(u, v)
-
+                color = render_func(x, y, width, height)
                 self.frame.SetFloatingColorAt(x, y, color)
+
+    def FastRender(self, x, y, width, height):
+        color = Vec3(0, 0, 0)
+
+        u = (4 * x / width) - 2
+        v = (2 * y / height) - 1
+
+        ray = self.scene.camera.MakeRay(u, v)
+        color = self.ComputeColor(u, v, ray)
+
+        return color
+
+    def AntiAliasedRender(self, x, y, width, height):
+        anti_aliasing_samples_count = 8
+
+        color = Vec3(0, 0, 0)
+
+        for i in range(anti_aliasing_samples_count):
+            u = ((4 * x + random01()) / width) - 2
+            v = ((2 * y + random01()) / height) - 1
+
+            ray = self.scene.camera.MakeRay(u, v)
+            color += self.ComputeColor(u, v, ray)
+
+        return color / anti_aliasing_samples_count
+
+    def ComputeColor(self, u, v, ray):
+        best_intersection = self.scene.CastRay(ray)
+
+        if best_intersection:
+            closest_light = self.scene.GetClosestLight(best_intersection.world_position)
+            light_position = closest_light.position.xyz()
+
+            return shaders.ComputeColor(best_intersection.obj, best_intersection, light_position)
+            # return shaders.ComputeFlatColor(best_intersection.obj, best_intersection, light_position)
+        else:
+            return shaders.DebugUVCoordinates(u, v)
+
+    def DebugRender(self, x, y, width, height):
+        debug_frame_orientation = False
+        debug_uv_coordinates = False
+        debug_normals = True
+        debug_depth = False
+
+        color = Vec3(0, 0, 0)
+
+        u = (4 * x / width) - 2
+        v = (2 * y / height) - 1
+
+        if debug_frame_orientation:
+            color.x = x / width
+            color.y = y / height
+            color.z = 0.2
+        elif debug_uv_coordinates:
+            color = shaders.DebugUVCoordinates(u, v)
+        else:
+            ray = self.scene.camera.MakeRay(u, v)
+            best_intersection = self.scene.CastRay(ray)
+
+            if best_intersection:
+                if debug_normals:
+                    color = shaders.DebugNormals(u, v, best_intersection.obj, best_intersection)
+                elif debug_depth:
+                    color = shaders.DebugDepth(best_intersection)
+
+        return color
 
 def RenderThread(thread_number, render_queue, stop_rendering_event):
     logging.info(f"starting rendering thread - {thread_number}")
