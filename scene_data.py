@@ -58,6 +58,10 @@ class Scene:
         sphere = Sphere(0.5, Vec4(0, 0, -1), material)
         self.AddObject(sphere)
 
+        material = DefaultMaterial()
+        sphere = Sphere(100, Vec4(0, -100.5, -1), material)
+        self.AddObject(sphere)
+
         light = LightSource(Vec4(-10, 5, 0, 1))
         self.AddObject(light)
 
@@ -66,16 +70,22 @@ class Scene:
         # self.AddObject(light)
 
     def InitDemoScene(self):
-        from objects import Sphere
+        self.camera.LookAt(Vec3(10, 10, 30), Vec3(0, 0, 0), Vec3(0, 1, 0))
+
+        from objects import Sphere, Plane
 
         min_sphere_radius = 2
         max_sphere_radius = 3
-        for x in range(-16, 16, 2 * max_sphere_radius + 1):
-            for y in range(-16, 16, 2 * max_sphere_radius + 1):
+        for x in range(-16, 16, 3 * max_sphere_radius + 1):
+            for y in range(-16, 16, 3 * max_sphere_radius + 1):
                 sphere = Sphere.GenerateRandomSphere()
                 sphere.radius = random_in_range(min_sphere_radius, max_sphere_radius)
                 sphere.position = Vec4(x + random_in_range(2, 4), random_in_range(2, 4), y + random_in_range(2, 4), 1)
                 self.AddObject(sphere)
 
-        light = LightSource(Vec4(1, 10, 0, 1))
+        material = DefaultMaterial()
+        plane = Plane(Vec3(0, 1, 0), Vec3(0, 0, 0), material)
+        self.AddObject(plane)
+
+        light = LightSource(Vec4(-10, 10, 10, 1))
         self.AddObject(light)
