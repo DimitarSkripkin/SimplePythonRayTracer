@@ -1,10 +1,11 @@
 
-from math_extentions import *
+import glm
+from math_extentions import random_in_range, get_squared_distance
 from camera import Camera
 from materials import DefaultMaterial, Color
 
 class Object:
-    def __init__(self, obj_type, position = Vec4(0, 0, 0, 1), material = None):
+    def __init__(self, obj_type, position = glm.vec4(0, 0, 0, 1), material = None):
         self.obj_type = obj_type
         self.position = position
         self.material = material
@@ -19,8 +20,8 @@ class Scene:
         self.objects = []
         self.lights = []
         self.camera = Camera()
-        self.camera.LookAt(Vec3(30, 30, 30), Vec3(0, 0, 0), Vec3(0, 1, 0))
-        # self.camera.LookAt(Vec3(15, 10, 5), Vec3(0, 0, 0), Vec3(0, 1, 0))
+        self.camera.LookAt(glm.vec3(30, 30, 30), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
+        # self.camera.LookAt(glm.vec3(15, 10, 5), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
 
     def AddObject(self, obj):
         if obj.obj_type == 'POINT_LIGHT':
@@ -50,27 +51,27 @@ class Scene:
         return current_closest
 
     def InitDebugScene(self):
-        self.camera.LookAt(Vec3(0, 0, 1), Vec3(0, 0, 0), Vec3(0, 1, 0))
+        self.camera.LookAt(glm.vec3(0, 0, 1), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
 
         from objects import Sphere
         material = DefaultMaterial()
         material.color = Color(225, 225, 225)
-        sphere = Sphere(0.5, Vec4(0, 0, -1), material)
+        sphere = Sphere(0.5, glm.vec4(0, 0, -1, 1), material)
         self.AddObject(sphere)
 
-        material = DefaultMaterial()
-        sphere = Sphere(100, Vec4(0, -100.5, -1), material)
+        # material = DefaultMaterial()
+        sphere = Sphere(100, glm.vec4(0, -100.5, -1, 1), material)
         self.AddObject(sphere)
 
-        light = LightSource(Vec4(-10, 5, 0, 1))
+        light = LightSource(glm.vec4(-10, 5, 0, 1))
         self.AddObject(light)
 
         # to debug if GetClosestLight method works
-        # light = LightSource(Vec4(10, 0, -5, 1))
+        # light = LightSource(glm.vec4(10, 0, -5, 1))
         # self.AddObject(light)
 
     def InitDemoScene(self):
-        self.camera.LookAt(Vec3(10, 10, 30), Vec3(0, 0, 0), Vec3(0, 1, 0))
+        self.camera.LookAt(glm.vec3(10, 10, 30), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
 
         from objects import Sphere, Plane
 
@@ -80,12 +81,16 @@ class Scene:
             for y in range(-16, 16, 3 * max_sphere_radius + 1):
                 sphere = Sphere.GenerateRandomSphere()
                 sphere.radius = random_in_range(min_sphere_radius, max_sphere_radius)
-                sphere.position = Vec4(x + random_in_range(2, 4), random_in_range(2, 4), y + random_in_range(2, 4), 1)
+                sphere.position = glm.vec4(x + random_in_range(2, 4), random_in_range(2, 4), y + random_in_range(2, 4), 1)
                 self.AddObject(sphere)
 
         material = DefaultMaterial()
-        plane = Plane(Vec3(0, 1, 0), Vec3(0, 0, 0), material)
+        plane = Plane(glm.vec3(0, 1, 0), glm.vec3(0, 0, 0), material)
         self.AddObject(plane)
 
-        light = LightSource(Vec4(-10, 10, 10, 1))
+        light = LightSource(glm.vec4(-10, 10, 10, 1))
         self.AddObject(light)
+
+        # to be used when there is support for multiple lights
+        # light = LightSource(glm.vec4(1, 10, 0, 1))
+        # self.AddObject(light)

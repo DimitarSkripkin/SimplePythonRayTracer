@@ -22,7 +22,7 @@ Support at least:
 # used to display rendered image
 pip install wx
 # adds vector and matrix support
-pip install gem
+pip install pyglm
 ```
 
 ## Disclaimer

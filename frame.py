@@ -1,19 +1,11 @@
 
-from math_extentions import Vec3
+import glm
 
 def clamp(value, min_value, max_value):
-    if value < min_value:
-        return min_value
-    elif value > max_value:
-        return max_value
-    return value
+    return glm.clamp(value, min_value, max_value)
 
 def clamp_color(color):
-    new_color = Vec3.FromVec3(color)
-    new_color[0] = clamp(new_color[0], 0, 255)
-    new_color[1] = clamp(new_color[1], 0, 255)
-    new_color[2] = clamp(new_color[2], 0, 255)
-    return new_color
+    return glm.clamp(color, 0, 255)
 
 class Frame:
     def __init__(self, width, height):
