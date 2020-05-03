@@ -15,7 +15,7 @@ class Ray:
         self.intensity = 1
         self.origin = origin
         self.direction = direction
-        self.t_min = 0.0
+        self.t_min = 0.001
         self.t_max = float("inf")
 
     # TODO: this should be refactored
