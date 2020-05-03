@@ -5,7 +5,7 @@ import queue
 import logging
 
 import glm
-from math_extentions import random01, random_unit_vector
+from math_extentions import random01, random_unit_vector, random_in_unit_sphere, random_in_hemisphere
 from frame import Frame
 from ray_tracer import Ray
 import shaders
@@ -77,7 +77,9 @@ class RenderJob:
             # return shaders.ComputeColor(best_intersection.obj, best_intersection, light_position)
             # return shaders.ComputeFlatColor(best_intersection.obj, best_intersection, light_position)
 
-            bounce_target = best_intersection.world_position + best_intersection.surface_normal + random_unit_vector()
+            # bounce_target = best_intersection.world_position + best_intersection.surface_normal + random_unit_vector()
+            # bounce_target = best_intersection.world_position + best_intersection.surface_normal + random_in_unit_sphere()
+            bounce_target = best_intersection.world_position + random_in_hemisphere(best_intersection.surface_normal)
             bounce_direction = glm.normalize(bounce_target - best_intersection.world_position)
             bounce_ray = Ray(best_intersection.world_position, bounce_direction)
             return self.ComputeColor(bounce_ray, bounce_limit - 1) * 0.5
