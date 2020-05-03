@@ -1,5 +1,6 @@
 
 import random
+import math
 from gem import matrix, vector
 
 def random_in_range(min_value, max_value):
@@ -7,6 +8,12 @@ def random_in_range(min_value, max_value):
 
 def random01():
     return random.random()
+
+def random_unit_vector():
+    a = random_in_range(0, 2 * math.pi)
+    z = random_in_range(-1, 1)
+    r = math.sqrt(1 - z*z)
+    return Vec3(r * math.cos(a), r * math.sin(a), z)
 
 def get_squared_distance(vecA, vecB):
     return (vecA.vector[0] - vecB.vector[0])**2 + (vecA.vector[1] - vecB.vector[1])**2 + (vecA.vector[2] - vecB.vector[2])**2

@@ -4,8 +4,9 @@ import threading
 import queue
 import logging
 
-from math_extentions import Vec3, Vec4, matrix, random01
+from math_extentions import Vec3, Vec4, matrix, random01, random_unit_vector
 from frame import Frame
+from ray_tracer import Ray
 import shaders
 
 class RenderJob:
@@ -21,8 +22,8 @@ class RenderJob:
         width = self.frame.width
         height = self.frame.height
 
-        render_func = self.FastRender
-        # render_func = self.AntiAliasedRender
+        # render_func = self.FastRender
+        render_func = self.AntiAliasedRender
         # render_func = self.DebugRender
 
         for y in range(self.fromY, self.toY):
@@ -37,7 +38,7 @@ class RenderJob:
         v = (2 * y / height) - 1
 
         ray = self.scene.camera.MakeRay(u, v)
-        color = self.ComputeColor(u, v, ray)
+        color = self.ComputeColor(ray)
 
         return color
 
@@ -51,20 +52,37 @@ class RenderJob:
             v = ((2 * y + random01()) / height) - 1
 
             ray = self.scene.camera.MakeRay(u, v)
-            color += self.ComputeColor(u, v, ray)
+            color += self.ComputeColor(ray)
 
-        return color / anti_aliasing_samples_count
+        # Divide the color total by the number of samples and gamma-correct
+        # for a gamma value of 2.0.
+        scale = 1.0 / anti_aliasing_samples_count
+        r = math.sqrt(scale * color[0])
+        g = math.sqrt(scale * color[1])
+        b = math.sqrt(scale * color[2])
+        return Vec3(r, g, b)
 
-    def ComputeColor(self, u, v, ray):
+    def ComputeColor(self, ray, bounce_limit = 15):
+        if bounce_limit <= 0:
+            return Vec3(0, 0, 0)
+
         best_intersection = self.scene.CastRay(ray)
 
+        ray_direction = Vec3.FromVec3(ray.direction)
         if best_intersection:
-            closest_light = self.scene.GetClosestLight(best_intersection.world_position)
-            light_position = closest_light.position.xyz()
+            # closest_light = self.scene.GetClosestLight(best_intersection.world_position)
+            # light_position = closest_light.position.xyz()
 
-            return shaders.ComputeColor(best_intersection.obj, best_intersection, light_position)
+            # return shaders.ComputeColor(best_intersection.obj, best_intersection, light_position)
             # return shaders.ComputeFlatColor(best_intersection.obj, best_intersection, light_position)
+
+            bounce_target = best_intersection.world_position + best_intersection.surface_normal + random_unit_vector()
+            bounce_direction = (bounce_target - best_intersection.world_position).normalize()
+            bounce_ray = Ray(best_intersection.world_position, bounce_direction)
+            return self.ComputeColor(bounce_ray, bounce_limit - 1) * 0.5
         else:
+            u = ray_direction.x
+            v = ray_direction.y
             return shaders.DebugUVCoordinates(u, v)
 
     def DebugRender(self, x, y, width, height):
