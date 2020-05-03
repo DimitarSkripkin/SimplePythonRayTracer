@@ -77,3 +77,26 @@ class Sphere(Object):
         material = DefaultMaterial()
         material.color = Color.RandomColor()
         return cls(radius, position, material)
+
+class Plane(Object):
+    def __init__(self, normal, position, material):
+        super().__init__('3D_OBJECT_PLANE', position, material)
+        self.normal = normal
+
+    def Intersect(self, ray):
+        ray_direction = ray.direction.xyz()
+        denominator = self.normal.dot(ray_direction)
+        # possible collision
+        # plane normal and ray direction are not in the same direction
+        if denominator < 0:
+            plane_position = self.position.xyz()
+            ray_origin = ray.origin.xyz()
+            oc = ray_origin - plane_position
+            ray_intersection_offset = oc.dot(self.normal) / -denominator
+            # ray_intersection_offset > ray.t_min plane is in front of the ray
+            if ray_intersection_offset < ray.t_max and ray_intersection_offset > ray.t_min:
+                intersection_point = ray.PointAtOffset(ray_intersection_offset)
+                intersection_result = IntersectionResult(self, intersection_point, ray_intersection_offset, self.normal)
+                return intersection_result
+
+        return None
