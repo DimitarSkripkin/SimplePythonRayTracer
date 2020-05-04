@@ -4,7 +4,7 @@ import math
 import glm
 from math_extentions import random_in_range
 from scene_data import Object
-from materials import Color, DefaultMaterial
+from materials import Color, RandomMaterial
 from ray_tracer import IntersectionResult
 
 class Sphere(Object):
@@ -75,7 +75,7 @@ class Sphere(Object):
     def GenerateRandomSphere(cls):
         radius = random_in_range(2, 5)
         position = glm.vec4(random_in_range(-5, 5), random_in_range(-5, 5), random_in_range(-5, 5), 1)
-        material = DefaultMaterial()
+        material = RandomMaterial()
         material.color = Color.RandomColor()
         return cls(radius, position, material)
 

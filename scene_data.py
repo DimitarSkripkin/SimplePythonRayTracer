@@ -2,7 +2,7 @@
 import glm
 from math_extentions import random_in_range, get_squared_distance
 from camera import Camera
-from materials import DefaultMaterial, Color
+from materials import Color, Lambertian, Reflective, RandomMaterial
 
 class Object:
     def __init__(self, obj_type, position = glm.vec4(0, 0, 0, 1), material = None):
@@ -54,13 +54,26 @@ class Scene:
         self.camera.LookAt(glm.vec3(0, 0, 1), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
 
         from objects import Sphere
-        material = DefaultMaterial()
-        material.color = Color(225, 225, 225)
+        material = Lambertian()
+        material.color = Color(0.7, 0.3, 0.3)
         sphere = Sphere(0.5, glm.vec4(0, 0, -1, 1), material)
         self.AddObject(sphere)
 
-        # material = DefaultMaterial()
+        material = Lambertian()
+        material.color = Color(0.8, 0.8, 0.0)
         sphere = Sphere(100, glm.vec4(0, -100.5, -1, 1), material)
+        self.AddObject(sphere)
+
+        material = Reflective()
+        material.color = Color(0.8, 0.6, 0.2)
+        sphere = Sphere(0.5, glm.vec4(1, 0, -1, 1), material)
+        sphere.material = material
+        self.AddObject(sphere)
+
+        material = Reflective()
+        material.color = Color(0.8, 0.8, 0.8)
+        sphere = Sphere(0.5, glm.vec4(-1, 0, -1, 1), material)
+        sphere.material = material
         self.AddObject(sphere)
 
         light = LightSource(glm.vec4(-10, 5, 0, 1))
@@ -84,7 +97,7 @@ class Scene:
                 sphere.position = glm.vec4(x + random_in_range(2, 4), random_in_range(2, 4), y + random_in_range(2, 4), 1)
                 self.AddObject(sphere)
 
-        material = DefaultMaterial()
+        material = Lambertian()
         plane = Plane(glm.vec3(0, 1, 0), glm.vec3(0, 0, 0), material)
         self.AddObject(plane)
 

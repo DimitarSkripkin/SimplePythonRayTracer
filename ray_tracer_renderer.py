@@ -77,12 +77,13 @@ class RenderJob:
             # return shaders.ComputeColor(best_intersection.obj, best_intersection, light_position)
             # return shaders.ComputeFlatColor(best_intersection.obj, best_intersection, light_position)
 
-            # bounce_target = best_intersection.world_position + best_intersection.surface_normal + random_unit_vector()
-            # bounce_target = best_intersection.world_position + best_intersection.surface_normal + random_in_unit_sphere()
-            bounce_target = best_intersection.world_position + random_in_hemisphere(best_intersection.surface_normal)
-            bounce_direction = glm.normalize(bounce_target - best_intersection.world_position)
-            bounce_ray = Ray(best_intersection.world_position, bounce_direction)
-            return self.ComputeColor(bounce_ray, bounce_limit - 1) * 0.5
+            material = best_intersection.obj.material
+            scatter_result = material.Scatter(ray, best_intersection)
+            if scatter_result:
+                material_color = glm.vec3(scatter_result.attenuation)
+                return material_color * self.ComputeColor(scatter_result.scattered, bounce_limit - 1)
+            else:
+                return glm.vec3(0, 0, 0)
         else:
             u = ray_direction.x
             v = ray_direction.y

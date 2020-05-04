@@ -22,7 +22,7 @@ def DebugDepth(best_intersection):
     return color
 
 def ComputeFlatColor(obj, _intersection, _light_position):
-    return glm.vec3(obj.material.color.r / 255, obj.material.color.g / 255, obj.material.color.b / 255)
+    return obj.material.color.AsVec3()
 
 # TODO: this should be refactored
 def ComputeColor(obj, intersection, light_position):
@@ -30,7 +30,7 @@ def ComputeColor(obj, intersection, light_position):
     intersection_normal = intersection.surface_normal
     # light_direction = -light_position.normalize().xyz()
     light_direction = glm.normalize(light_position)
-    albedo = glm.vec3(obj.material.color.r / 255, obj.material.color.g / 255, obj.material.color.b / 255) # * obj.material.ambient
+    albedo = obj.material.color.AsVec3() # * obj.material.ambient
     dot_product = max(0.0, glm.dot(light_direction, intersection_normal))
     color = albedo * dot_product
     return color
