@@ -84,17 +84,18 @@ class Scene:
         # self.AddObject(light)
 
     def InitDemoScene(self):
-        self.camera.LookAt(glm.vec3(10, 10, 30), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
+        self.camera.LookAt(glm.vec3(10, 10, 20), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
 
         from objects import Sphere, Plane
 
         min_sphere_radius = 2
         max_sphere_radius = 3
-        for x in range(-16, 16, 3 * max_sphere_radius + 1):
-            for y in range(-16, 16, 3 * max_sphere_radius + 1):
+        cell_size = 2 * max_sphere_radius + 1
+        for x in range(-1, 2):
+            for y in range(-1, 2):
                 sphere = Sphere.GenerateRandomSphere()
                 sphere.radius = random_in_range(min_sphere_radius, max_sphere_radius)
-                sphere.position = glm.vec4(x + random_in_range(2, 4), random_in_range(2, 4), y + random_in_range(2, 4), 1)
+                sphere.position = glm.vec4(x * cell_size + random_in_range(2, 4), random_in_range(2, 4), y * cell_size + random_in_range(2, 4), 1)
                 self.AddObject(sphere)
 
         material = Lambertian()
