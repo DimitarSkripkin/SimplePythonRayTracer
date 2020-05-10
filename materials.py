@@ -24,8 +24,8 @@ class Color:
             random_in_range(min_color_value, max_color_value))
 
 class Material:
-    def __init__(self):
-        self.color = Color(0.250, 0.5, 1)
+    def __init__(self, color = Color(0.250, 0.5, 1)):
+        self.color = color
 
 class ScatterResult:
     def __init__(self, attenuation, scattered):
@@ -50,7 +50,7 @@ class Reflective(Material):
 
     def Scatter(self, ray, hit_record):
         ray_direction = glm.vec3(ray.direction)
-        # v - 2*dot(v, n)*n;
+        # v - 2*dot(v, n)*n
         reflection_direction = glm.reflect(ray_direction, hit_record.surface_normal)
         if glm.dot(reflection_direction, hit_record.surface_normal) <= 0:
             return None
@@ -58,11 +58,66 @@ class Reflective(Material):
         reflected_ray = Ray(hit_record.world_position, reflection_direction)
         return ScatterResult(self.color.AsVec4(), reflected_ray)
 
+class Glossy(Material):
+    def __init__(self, roughness = 0.8):
+        super().__init__()
+        self.roughness = roughness
+
+    def Scatter(self, ray, hit_record):
+        ray_direction = glm.vec3(ray.direction)
+        # v - 2*dot(v, n)*n
+        reflection_direction = glm.reflect(ray_direction, hit_record.surface_normal)
+        if glm.dot(reflection_direction, hit_record.surface_normal) <= 0:
+            return None
+
+        reflected_ray = Ray(hit_record.world_position, reflection_direction + random_in_unit_sphere() * self.roughness)
+        return ScatterResult(self.color.AsVec4(), reflected_ray)
+
+class Transperant(Material):
+    def __init__(self, refraction_index = 1.5):
+        super().__init__()
+        self.refraction_index = refraction_index
+
+    def Scatter(self, ray, hit_record):
+        self.color = Color(1, 1, 1)
+        ray_direction = glm.vec3(ray.direction)
+        surface_normal = hit_record.surface_normal
+
+        # refract
+        etaI_over_etaT = 1.0 / self.refraction_index
+        ray_surface_dot = glm.dot(surface_normal, ray_direction)
+        is_front_face = ray_surface_dot < 0
+        if not is_front_face:
+            # it's backside of the surface
+            etaI_over_etaT = self.refraction_index
+            surface_normal = -surface_normal
+
+        cos_theta = glm.fmin(glm.dot(-ray_direction, surface_normal), 1.0)
+        # cos_theta = glm.fmin(ray_surface_dot, 1.0)
+        sin_theta = math.sqrt(1.0 - cos_theta * cos_theta)
+        if etaI_over_etaT * sin_theta > 1.0:
+            # ray can't be refracted so should be reflected
+            reflection_direction = glm.reflect(ray_direction, surface_normal)
+            reflected_ray = Ray(hit_record.world_position, reflection_direction)
+            return ScatterResult(self.color.AsVec4(), reflected_ray)
+
+        reflect_prob = schlick_approximation(cos_theta, etaI_over_etaT)
+        if random01() < reflect_prob:
+            reflection_direction = glm.reflect(ray_direction, surface_normal)
+            reflected_ray = Ray(hit_record.world_position, reflection_direction)
+            return ScatterResult(self.color.AsVec4(), reflected_ray)
+
+        refraction_direction = refract(ray_direction, surface_normal, etaI_over_etaT)
+        refracted_ray = Ray(hit_record.world_position, refraction_direction)
+        return ScatterResult(self.color.AsVec4(), refracted_ray)
+
 def RandomMaterial():
-    material_index = random.randint(0, 1)
+    material_index = random.randint(0, 3)
     materials = {
         0: Lambertian,
-        1: Reflective
+        1: Reflective,
+        2: Glossy,
+        3: Transperant
     }
 
     return materials.get(material_index)()
