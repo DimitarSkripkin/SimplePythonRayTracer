@@ -30,7 +30,10 @@ class Sphere(Object):
             ray_intersection_offset = (-half_b - math.sqrt(discriminant)) / a
             if ray_intersection_offset < ray.t_max and ray_intersection_offset > ray.t_min:
                 intersection_point = ray.PointAtOffset(ray_intersection_offset)
-                surface_normal = glm.normalize(intersection_point - sphere_center)
+
+                # surface_normal = glm.normalize(intersection_point - sphere_center)
+                # if radius is negative then front-face is inside the sphere
+                surface_normal = (intersection_point - sphere_center) / self.radius
                 intersection_result = IntersectionResult(self, intersection_point, ray_intersection_offset, surface_normal)
                 return intersection_result
 
@@ -38,7 +41,10 @@ class Sphere(Object):
             ray_intersection_offset = (-half_b + math.sqrt(discriminant)) / a
             if ray_intersection_offset < ray.t_max and ray_intersection_offset > ray.t_min:
                 intersection_point = ray.PointAtOffset(ray_intersection_offset)
-                surface_normal = glm.normalize(intersection_point - sphere_center)
+
+                # surface_normal = glm.normalize(intersection_point - sphere_center)
+                # if radius is negative then front-face is inside the sphere
+                surface_normal = (intersection_point - sphere_center) / self.radius
                 intersection_result = IntersectionResult(self, intersection_point, ray_intersection_offset, surface_normal)
                 return intersection_result
 
