@@ -91,9 +91,9 @@ class Transperant(Material):
             # it's backside of the surface
             etaI_over_etaT = self.refraction_index
             surface_normal = -surface_normal
+            ray_surface_dot = -ray_surface_dot
 
-        cos_theta = glm.fmin(glm.dot(-ray_direction, surface_normal), 1.0)
-        # cos_theta = glm.fmin(ray_surface_dot, 1.0)
+        cos_theta = glm.fmin(-ray_surface_dot, 1.0)
         sin_theta = math.sqrt(1.0 - cos_theta * cos_theta)
         if etaI_over_etaT * sin_theta > 1.0:
             # ray can't be refracted so should be reflected
