@@ -2,7 +2,7 @@
 import glm
 from math_extentions import random_in_range, get_squared_distance
 from camera import Camera
-from materials import Color, Lambertian, Reflective, RandomMaterial
+from materials import Color, Lambertian, Reflective, Glossy, Transperant, RandomMaterial
 
 class Object:
     def __init__(self, obj_type, position = glm.vec4(0, 0, 0, 1), material = None):
@@ -51,11 +51,12 @@ class Scene:
         return current_closest
 
     def InitDebugScene(self):
-        self.camera.LookAt(glm.vec3(0, 0, 1), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0))
+        self.camera.LookAt(glm.vec3(0, 0, 1), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0), 45)
+        # self.camera.LookAt(glm.vec3(-2, 2, 1), glm.vec3(0, 0, -1), glm.vec3(0, 1, 0), 15)
 
         from objects import Sphere
         material = Lambertian()
-        material.color = Color(0.7, 0.3, 0.3)
+        material.color = Color(0.1, 0.2, 0.5)
         sphere = Sphere(0.5, glm.vec4(0, 0, -1, 1), material)
         self.AddObject(sphere)
 
@@ -64,15 +65,22 @@ class Scene:
         sphere = Sphere(100, glm.vec4(0, -100.5, -1, 1), material)
         self.AddObject(sphere)
 
-        material = Reflective()
+        material = Glossy(0.3)
         material.color = Color(0.8, 0.6, 0.2)
         sphere = Sphere(0.5, glm.vec4(1, 0, -1, 1), material)
         sphere.material = material
         self.AddObject(sphere)
 
-        material = Reflective()
+        # material = Reflective()
+        material = Transperant(1.5)
         material.color = Color(0.8, 0.8, 0.8)
         sphere = Sphere(0.5, glm.vec4(-1, 0, -1, 1), material)
+        sphere.material = material
+        self.AddObject(sphere)
+
+        material = Transperant(1.5)
+        material.color = Color(0.8, 0.8, 0.8)
+        sphere = Sphere(-0.45, glm.vec4(-1, 0, -1, 1), material)
         sphere.material = material
         self.AddObject(sphere)
 
