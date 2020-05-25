@@ -51,37 +51,47 @@ class Scene:
         return current_closest
 
     def InitDebugScene(self):
-        self.camera.LookAt(glm.vec3(0, 0, 1), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0), 45)
+        self.camera.LookAt(glm.vec3(0, 1, 1.5), glm.vec3(0, 0, 0), glm.vec3(0, 1, 0), 45)
         # self.camera.LookAt(glm.vec3(-2, 2, 1), glm.vec3(0, 0, -1), glm.vec3(0, 1, 0), 15)
 
         from objects import Sphere
         material = Lambertian()
         material.color = Color(0.1, 0.2, 0.5)
-        sphere = Sphere(0.5, glm.vec4(0, 0, -1, 1), material)
+        sphere = Sphere(0.5, glm.vec4(-2, 0, -1, 1), material)
         self.AddObject(sphere)
 
-        material = Lambertian()
-        material.color = Color(0.8, 0.8, 0.0)
-        sphere = Sphere(100, glm.vec4(0, -100.5, -1, 1), material)
-        self.AddObject(sphere)
-
-        material = Glossy(0.3)
-        material.color = Color(0.8, 0.6, 0.2)
-        sphere = Sphere(0.5, glm.vec4(1, 0, -1, 1), material)
-        sphere.material = material
-        self.AddObject(sphere)
-
-        # material = Reflective()
-        material = Transperant(1.5)
+        material = Reflective()
         material.color = Color(0.8, 0.8, 0.8)
         sphere = Sphere(0.5, glm.vec4(-1, 0, -1, 1), material)
         sphere.material = material
         self.AddObject(sphere)
 
+        material = Glossy(0.3)
+        material.color = Color(0.8, 0.6, 0.2)
+        sphere = Sphere(0.5, glm.vec4(0, 0, -1, 1), material)
+        sphere.material = material
+        self.AddObject(sphere)
+
         material = Transperant(1.5)
         material.color = Color(0.8, 0.8, 0.8)
-        sphere = Sphere(-0.45, glm.vec4(-1, 0, -1, 1), material)
+        sphere = Sphere(0.5, glm.vec4(1, 0, -1, 1), material)
         sphere.material = material
+        self.AddObject(sphere)
+
+        material = Transperant(1.5)
+        material.color = Color(0.8, 0.8, 0.8)
+        sphere = Sphere(-0.45, glm.vec4(1, 0, -1, 1), material)
+        sphere.material = material
+        self.AddObject(sphere)
+
+        material = Lambertian()
+        material.color = Color(0.5, 0.25, 0.125)
+        sphere = Sphere(0.5, glm.vec4(2, 0, -1, 1), material)
+        self.AddObject(sphere)
+
+        material = Lambertian()
+        material.color = Color(0.8, 0.8, 0.0)
+        sphere = Sphere(100, glm.vec4(0, -100.5, -1, 1), material)
         self.AddObject(sphere)
 
         light = LightSource(glm.vec4(-10, 5, 0, 1))
