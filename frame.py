@@ -7,6 +7,10 @@ def clamp(value, min_value, max_value):
 def clamp_color(color):
     return glm.clamp(color, 0, 255)
 
+def rgb_to_greyscale(color):
+    # ( (0.3 * R) + (0.59 * G) + (0.11 * B) )
+    return glm.vec3((0.3 * color.x) + (0.59 * color.y) + (0.11 * color.z))
+
 class Frame:
     def __init__(self, width, height):
         self.width = width
