@@ -155,22 +155,10 @@ class RayTracerRenderer:
         # TODO: remove when there is no need for visual indication if new rendering is started
         self.frame = Frame(self.width, self.height)
 
-        # generate worker jobs
         horizontal_frame_step = 16
         vertical_frame_step = 16
-        for y in range(0, self.height, vertical_frame_step):
-            for x in range(0, self.width, horizontal_frame_step):
-                fromX = x
-                toX = fromX + horizontal_frame_step
-                if toX > self.width:
-                    toX = self.width
-                fromY = y
-                toY = fromY + vertical_frame_step
-                if toY > self.height:
-                    toY = self.height
-                # logging.debug(f"new rendering job for {fromX} - {toX}, {fromY} - {toY}")
-                render_job = RenderJob(self.frame, scene, fromX, toX, fromY, toY)
-                self.render_queue.put(render_job)
+        self.JobsWithSpiralRenderPattern(scene, horizontal_frame_step, vertical_frame_step)
+        # self.JobsWithBottomToTopRenderPattern(scene, horizontal_frame_step, vertical_frame_step)
 
         # create and start worker threads
         self.render_threads = []
@@ -194,3 +182,49 @@ class RayTracerRenderer:
                 return True
 
         return False
+
+    def JobsWithBottomToTopRenderPattern(self, scene, horizontal_frame_step, vertical_frame_step):
+        # generate worker jobs
+        for y in range(0, self.height, vertical_frame_step):
+            for x in range(0, self.width, horizontal_frame_step):
+                from_x = x
+                to_x = from_x + horizontal_frame_step
+                if to_x > self.width:
+                    to_x = self.width
+                from_y = y
+                to_y = from_y + vertical_frame_step
+                if to_y > self.height:
+                    to_y = self.height
+                # logging.debug(f"new rendering job for {from_x} - {to_x}, {from_y} - {to_y}")
+                render_job = RenderJob(self.frame, scene, from_x, to_x, from_y, to_y)
+                self.render_queue.put(render_job)
+
+    def JobsWithSpiralRenderPattern(self, scene, horizontal_frame_step, vertical_frame_step):
+        # generate worker jobs
+        frame_step = glm.vec2(horizontal_frame_step, vertical_frame_step)
+        origin = glm.vec2(self.width / 2, self.height / 2) - frame_step
+        for (x, y) in spiral(int(self.width / horizontal_frame_step) + 1, int(self.height / vertical_frame_step) + 1):
+            from_point = glm.vec2(x, y) * frame_step + origin
+            to_point = from_point + frame_step
+
+            from_point.x = glm.clamp(from_point.x, 0, self.width)
+            from_point.y = glm.clamp(from_point.y, 0, self.height)
+            to_point.x = glm.clamp(to_point.x, 0, self.width)
+            to_point.y = glm.clamp(to_point.y, 0, self.height)
+
+            render_job = RenderJob(self.frame, scene, int(from_point.x), int(to_point.x), int(from_point.y), int(to_point.y))
+            self.render_queue.put(render_job)
+
+def spiral(width, height):
+    x = 0
+    y = 0
+    dx = 0
+    dy = -1
+    half_width = width / 2
+    half_height = height / 2
+    for i in range(max(width, height)**2):
+        if (-half_width < x <= half_width) and (-half_height < y <= half_height):
+            yield (x, y)
+        if x == y or (x < 0 and x == -y) or (x > 0 and x == 1 - y):
+            dx, dy = -dy, dx
+        x, y = x + dx, y + dy
