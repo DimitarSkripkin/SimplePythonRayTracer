@@ -24,8 +24,9 @@ class Color:
             random_in_range(min_color_value, max_color_value))
 
 class Material:
-    def __init__(self, color = Color(0.250, 0.5, 1)):
+    def __init__(self, color = Color(0.250, 0.5, 1), emitted = Color(0, 0, 0)):
         self.color = color
+        self.emitted = emitted
 
 class ScatterResult:
     def __init__(self, attenuation, scattered):
@@ -111,13 +112,21 @@ class Transperant(Material):
         refracted_ray = Ray(hit_record.world_position, refraction_direction)
         return ScatterResult(self.color.AsVec4(), refracted_ray)
 
+class LightEmitting(Material):
+    def __init__(self):
+        super().__init__(emitted = Color(1, 1, 1))
+
+    def Scatter(self, ray, hit_record):
+        return None
+
 def RandomMaterial():
-    material_index = random.randint(0, 3)
+    material_index = random.randint(0, 4)
     materials = {
         0: Lambertian,
         1: Reflective,
         2: Glossy,
-        3: Transperant
+        3: Transperant,
+        4: LightEmitting
     }
 
     return materials.get(material_index)()

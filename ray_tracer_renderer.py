@@ -79,11 +79,14 @@ class RenderJob:
 
             material = best_intersection.obj.material
             scatter_result = material.Scatter(ray, best_intersection)
-            if scatter_result:
-                material_color = glm.vec3(scatter_result.attenuation)
-                return material_color * self.ComputeColor(scatter_result.scattered, bounce_limit - 1)
-            else:
-                return glm.vec3(0, 0, 0)
+            if not scatter_result:
+                return material.emitted.AsVec3()
+
+            material_color = glm.vec3(scatter_result.attenuation)
+            return (
+                material.emitted.AsVec3()
+                + material_color * self.ComputeColor(scatter_result.scattered, bounce_limit - 1)
+            )
         else:
             u = ray_direction.x
             v = ray_direction.y
