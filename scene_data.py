@@ -2,7 +2,7 @@
 import glm
 from math_extentions import random_in_range, get_squared_distance
 from camera import Camera
-from materials import Color, Lambertian, Reflective, Glossy, Transperant, RandomMaterial
+from materials import Color, Lambertian, Reflective, Glossy, Transparent, RandomMaterial
 
 class Object:
     def __init__(self, obj_type, position = glm.vec4(0, 0, 0, 1), material = None):
@@ -72,13 +72,13 @@ class Scene:
         sphere.material = material
         self.AddObject(sphere)
 
-        material = Transperant(1.5)
+        material = Transparent(1.5)
         material.color = Color(0.8, 0.8, 0.8)
         sphere = Sphere(0.5, glm.vec4(1, 0, -1, 1), material)
         sphere.material = material
         self.AddObject(sphere)
 
-        material = Transperant(1.5)
+        material = Transparent(1.5)
         material.color = Color(0.8, 0.8, 0.8)
         sphere = Sphere(-0.45, glm.vec4(1, 0, -1, 1), material)
         sphere.material = material

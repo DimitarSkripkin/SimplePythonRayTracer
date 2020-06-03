@@ -74,7 +74,7 @@ class Glossy(Material):
         reflected_ray = Ray(hit_record.world_position, reflection_direction + random_in_unit_sphere() * self.roughness)
         return ScatterResult(self.color.AsVec4(), reflected_ray)
 
-class Transperant(Material):
+class Transparent(Material):
     def __init__(self, refraction_index = 1.5):
         super().__init__()
         self.refraction_index = refraction_index
@@ -125,7 +125,7 @@ def RandomMaterial():
         0: Lambertian,
         1: Reflective,
         2: Glossy,
-        3: Transperant,
+        3: Transparent,
         4: LightEmitting
     }
 
