@@ -107,3 +107,50 @@ class Plane(Object):
                 return intersection_result
 
         return None
+
+class TriangleMesh(Object):
+    def __init__(self, triangles, position, material):
+        super().__init__('3D_OBJECT_PLANE', position, material)
+        self.triangles = triangles
+
+    def Intersect(self, ray):
+        ray_direction = ray.direction
+        mesh_position = glm.vec3(self.position)
+        best_collision = None
+        for triangle in self.triangles:
+            collision_result = self.RayTriangleCollisionCheck(
+                ray,
+                triangle[0] + mesh_position,
+                triangle[1] + mesh_position,
+                triangle[2] + mesh_position)
+            if collision_result and (not best_collision
+                or collision_result.ray_origin_offset < best_collision.ray_origin_offset):
+                best_collision = collision_result
+
+        return best_collision
+
+    # taken from https://stackoverflow.com/questions/42740765/intersection-between-line-and-triangle-in-3d#answer-42752998
+    def RayTriangleCollisionCheck(self, ray, a, b, c):
+        ray_direction = ray.direction
+        ray_origin = ray.origin
+
+        edge1 = b - a
+        edge2 = c - a
+        normal = glm.cross(edge1, edge2)
+        det = -glm.dot(ray_direction, normal)
+        invertDet = 1.0/det
+        AO  = ray_origin - a
+        DAO = glm.cross(AO, ray_direction)
+        u =  glm.dot(edge2, DAO) * invertDet
+        v = -glm.dot(edge1, DAO) * invertDet
+        ray_intersection_offset =  glm.dot(AO, normal)  * invertDet
+        if det >= 1e-6 and ray_intersection_offset >= 0.0 and u >= 0.0 and v >= 0.0 and (u+v) <= 1.0:
+            intersection_point = ray.PointAtOffset(ray_intersection_offset)
+            normal = glm.normalize(normal)
+            intersection_result = IntersectionResult(
+                self,
+                intersection_point,
+                ray_intersection_offset,
+                normal)
+            return intersection_result
+        return None
