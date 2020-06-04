@@ -96,7 +96,7 @@ class Plane(Object):
         # possible collision
         # plane normal and ray direction are not in the same direction
         if denominator < 0:
-            plane_position = self.position
+            plane_position = glm.vec3(self.position)
             ray_origin = ray.origin
             oc = ray_origin - plane_position
             ray_intersection_offset = glm.dot(oc, self.normal) / -denominator
