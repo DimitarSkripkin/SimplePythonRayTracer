@@ -88,9 +88,7 @@ class RenderJob:
                 + material_color * self.ComputeColor(scatter_result.scattered, bounce_limit - 1)
             )
         else:
-            u = ray_direction.x
-            v = ray_direction.y
-            return shaders.DebugUVCoordinates(u, v)
+            return glm.vec3(0, 0, 0)
 
     def DebugRender(self, x, y, width, height):
         debug_frame_orientation = False
