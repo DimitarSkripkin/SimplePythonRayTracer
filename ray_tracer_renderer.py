@@ -53,7 +53,10 @@ class RenderJob:
             v = ((2 * y + random01()) / height) - 1
 
             ray = self.scene.camera.MakeRay(u, v)
-            color += self.ComputeColor(ray)
+            try:
+                color += self.ComputeColor(ray)
+            except:
+                logging.error(f"failed to process job for coordinates - {u}x{v}")
 
         # Divide the color total by the number of samples and gamma-correct
         # for a gamma value of 2.0.
