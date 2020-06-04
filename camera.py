@@ -2,7 +2,7 @@
 import math
 
 import glm
-from ray_tracer import Ray
+from ray_data import Ray
 
 class Camera:
     def __init__(self, fov = 60, aspect_ratio = 16 / 9):

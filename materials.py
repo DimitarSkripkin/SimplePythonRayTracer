@@ -1,6 +1,6 @@
 
 from math_extentions import *
-from ray_tracer import Ray
+from ray_data import Ray
 
 class Color:
     def __init__(self, r = 0, g = 0, b = 0, alpha = 1):

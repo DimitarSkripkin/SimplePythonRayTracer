@@ -5,7 +5,7 @@ import glm
 from math_extentions import random_in_range
 from scene_data import Object
 from materials import Color, RandomMaterial
-from ray_tracer import IntersectionResult
+from ray_data import IntersectionResult
 
 class Sphere(Object):
     def __init__(self, radius, position, material):

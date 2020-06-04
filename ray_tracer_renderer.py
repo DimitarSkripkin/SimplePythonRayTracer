@@ -7,7 +7,7 @@ import logging
 import glm
 from math_extentions import random01, random_unit_vector, random_in_unit_sphere, random_in_hemisphere
 from frame import Frame
-from ray_tracer import Ray
+from ray_data import Ray
 import shaders
 
 class RenderJob:
