@@ -166,7 +166,7 @@ class RayTracerRenderer:
 
         # create and start worker threads
         self.render_threads = []
-        worker_threads_count = 16
+        worker_threads_count = 1
         for thread_number in range(0, worker_threads_count):
             render_thread_args = (thread_number, self.render_queue, self.stop_rendering_event)
             render_thread = threading.Thread(target=RenderThread, args=render_thread_args)
